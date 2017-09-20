@@ -10,7 +10,45 @@
          online at your node.js address under /socket.io/socket.io.js 
          You can disable that on the server if desired
     -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script type="text/babel">
+        let user = '';
+        const connectSocket = (e) =>{
+            const message = document.querySelector("#message");
+            const chat = document.querySelector("#chat");
+            const send = document.querySelector("#send");
+            const socket = io.connect();
+            
+            socket.on('connect', () =>{
+               user = document.querySelector("#username").value;
+                
+                if(!user) {
+                    user = 'unknown';
+                }
+                
+                socket.emit('join', { name: user });
+            });
+            
+            socket.on('msg', (data) =>{
+                console.log(data);  
+                chat.innerHTML += data.name + ": " + data.msg + "&#13;&#10;";
+            });
+            
+        };
+        const init = () =>{
+            const connect = document.querySelector("#connect");
+            connect.addEventListener('click', connectSocket);
+            send.addEventListener('click', () =>{
+                const socket = io.connect();
+                const userMessage = message.value;
+                console.log(userMessage);
+                console.log(user);
+                socket.emit('msgToServer', { name: user, msg: userMessage });
+            });
+        };
+        window.onload = init;
+    </script>
 	<style>
 		textarea {
 			display: block;
